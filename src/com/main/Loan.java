@@ -1,6 +1,8 @@
 package com.main;
 
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Date;
 import java.util.DoubleSummaryStatistics;
 
@@ -74,9 +76,8 @@ public class Loan {
 
     public Double round(Double value)
     {
-        long factor = (long) Math.pow(10,2);
-        value = value * factor;
-        long tmp = Math.round(value);
-        return (double) tmp / factor;
+        BigDecimal bd = new BigDecimal(value);
+        bd = bd.setScale(2, RoundingMode.HALF_UP);
+        return bd.doubleValue();
     }
 }
