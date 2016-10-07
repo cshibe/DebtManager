@@ -3,16 +3,19 @@ package com.main;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Date;
-import java.util.DoubleSummaryStatistics;
+import java.util.*;
 
 public class Loan {
 
     private Double principleAmount;
-    private Double interestRunningAmount=0.0;
+    private Double interestRunningAmount = 0.0;
     private Double interestRate;
-    private Date startDate;
+    private Calendar startDate;
+    private Calendar currentDate;
     private Double weeklyPayment;
+    private Double totalAmountPaid = 0.0;
+    private Double totalInterestAmountPaid = 0.0;
+    private Collection<Payment> payments = new ArrayList<>();
 
     public Loan() {}
 
@@ -32,12 +35,13 @@ public class Loan {
         this.interestRate = interestRate;
     }
 
-    public Date getStartDate() {
+    public Calendar getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(Date startDate) {
+    public void setStartDate(Calendar startDate) {
         this.startDate = startDate;
+        this.currentDate = startDate;
     }
 
     public Double getWeeklyPayment() {
@@ -55,8 +59,13 @@ public class Loan {
 
     public void runDay()
     {
+        currentDate.add(Calendar.DAY_OF_MONTH, 1);
         interestRunningAmount += getDailyInterestAmount();
         interestRunningAmount = round(interestRunningAmount);
+    }
+
+    public Calendar getCurrentDate() {
+        return currentDate;
     }
 
     public Double getInterestRunningAmount() {
@@ -69,15 +78,44 @@ public class Loan {
 
     public void runPayment()
     {
-        weeklyPayment = weeklyPayment - interestRunningAmount;
+        totalAmountPaid += weeklyPayment;
+        totalInterestAmountPaid += interestRunningAmount;
+        Double remainingAmount = weeklyPayment - interestRunningAmount;
         interestRunningAmount = 0.0;
-        principleAmount = principleAmount - weeklyPayment;
+        principleAmount = principleAmount - remainingAmount;
     }
 
     public Double round(Double value)
     {
         BigDecimal bd = new BigDecimal(value);
-        bd = bd.setScale(2, RoundingMode.HALF_UP);
+        bd = bd.setScale(2, RoundingMode.CEILING);
         return bd.doubleValue();
+    }
+
+    public Double getTotalAmountPaid() {
+        return totalAmountPaid;
+    }
+
+    public void setTotalAmountPaid(Double totalAmountPaid) {
+        this.totalAmountPaid = totalAmountPaid;
+    }
+
+    public Double getTotalInterestAmountPaid() {
+        return round(totalInterestAmountPaid);
+    }
+
+    public void setTotalInterestAmountPaid(Double totalInterestAmountPaid) {
+        this.totalInterestAmountPaid = totalInterestAmountPaid;
+    }
+
+    public void addPayment(Payment payment)
+    {
+        payments.add(payment);
+    }
+
+    public Collection<Payment> getPayments()
+    {
+        Collection<Payment> copy = payments;
+        return  copy;
     }
 }
